@@ -4,6 +4,10 @@ from ortools.linear_solver import pywraplp
 
 st.title("Cattle Feed Optimization")
 
+# intro
+
+st.write('Hello! Here you can optimize feed for your cattle!')
+
 # Read specific columns from each Excel sheet
 
 concentrates_df = pd.read_excel('feed.xlsx', sheet_name='Concentrates').dropna(subset = 'FeedStuff')
@@ -55,6 +59,8 @@ filtered_ingredients = pd.concat([
 ])
 
 # Display the filtered ingredients with prices
+
+st.write('You can check the ingredients along with nutritional values in the table below:')
 filtered_ingredients['Price'] = filtered_ingredients['FeedStuff'].map(prices)
 st.write(filtered_ingredients[['FeedStuff', 'TDN', 'ME', 'Ca', 'P', 'CP', 'Price']])
 
@@ -118,14 +124,14 @@ if st.button('Optimize') and len(selected_ingredients) >= 3:
 
         # Display the results
         if status == pywraplp.Solver.OPTIMAL:
-            st.write('Optimal Solution Found:')
+            st.header('Optimal Solution Found:')
             total_nutrient_values = {nutrient: 0 for nutrient in nutrient_columns}
             total_cost = 0
             
             for i, ingredient in enumerate(ingredient_names):
                 amount = ingredient_vars[i].solution_value()
                 cost = ingredient_vars[i].solution_value() * costs[i]
-                st.write(f'*{ingredient}: {amount:.2f} kg')
+                st.write(f'{ingredient}: {amount:.2f} kg')
                 total_cost += cost
                 
                 # Calculate total nutritional values
@@ -133,13 +139,13 @@ if st.button('Optimize') and len(selected_ingredients) >= 3:
                     nutrient_content = filtered_ingredients[filtered_ingredients['FeedStuff'] == ingredient][nutrient].values[0]
                     total_nutrient_values[nutrient] += amount * nutrient_content
 
-            st.write(f'Total Cost: Rs {total_cost:.2f}')
+            st.header(f'Total Cost: Rs {total_cost:.2f}')
 
             # Display total nutritional values
-            st.write('Total Nutritional Values:')
+            st.header(f'Total Nutritional Values:')
             for nutrient in nutrient_columns:
                 value = total_nutrient_values[nutrient]
-                requirement = float(selected_requirements[nutrient].values[0])  # Convert to the same scale
+                requirement = float(selected_requirements[nutrient].values[0])
                 if value < requirement:
                     st.markdown(f"**{nutrient}: {value/100:.2f}** (Less than required: {requirement:.2f})", unsafe_allow_html=True)
                 else:
