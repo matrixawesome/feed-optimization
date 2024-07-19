@@ -144,12 +144,12 @@ if st.button('Optimize') and len(selected_ingredients) >= 3:
             # Display total nutritional values
             st.header(f'Total Nutritional Values:')
             for nutrient in nutrient_columns:
-                value = total_nutrient_values[nutrient]
+                value = total_nutrient_values[nutrient]/100
                 requirement = float(selected_requirements[nutrient].values[0])
                 if value < requirement:
-                    st.markdown(f"**{nutrient}: {value/100:.2f}** (Less than required: {requirement:.2f})", unsafe_allow_html=True)
+                    st.markdown(f"**{nutrient}: {value:.2f}** (Less than required: {requirement:.2f})", unsafe_allow_html=True)
                 else:
-                    st.write(f'{nutrient}: {value/100:.2f}')
+                    st.write(f'{nutrient}: {value:.2f}')
 
         else:
             st.write('No optimal solution found.')
